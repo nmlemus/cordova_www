@@ -65,6 +65,7 @@ angular
                         var colors = ['navy', 'slate', 'olive', 'moss', 'chocolate', 'buttercup', 'maroon', 'cerise', 'plum', 'orchid'];
                         return colors[(Math.random() * colors.length) >>> 0];
                     };
+
                     easyrtc.setPeerListener(function (easyrtcid, msgType, content) {
                         var id = findID(easyrtcid, $rootScope.people);
                         if (id != -1) {
@@ -75,6 +76,18 @@ angular
                                 text: content,
                                 timestamp: new Date().toISOString()
                             };
+
+                            // Insertar en la base de datos local (SQlite) los mensajes recibidos
+                            $rootScope.db.transaction(function (tx) {
+
+                                tx.executeSql("INSERT INTO chat_table (uuid, person_name, text, status, timestamp, sent_at, received_at, read_at) VALUES (?,?,?,?,?,?,?,?);", [easyrtcid, "Me", content, "received", null, null, new Date().toISOString(), null], function (tx, res) {
+                                    console.log("insertId: " + res.insertId + " -- probably 1");
+                                    console.log("rowsAffected: " + res.rowsAffected + " -- should be 1");
+                                }, function (e) {
+                                    console.log("ERROR: " + e.message);
+                                });
+                            });
+
                             if (!$rootScope.person || $rootScope.person.name != easyrtcid) {
                                 $rootScope.people[id].newMessage = 'block';
                                 $rootScope.people[id].notification_count++;

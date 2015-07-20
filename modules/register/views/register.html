@@ -2,6 +2,7 @@
     h1 {
         text-align: center;
     }
+
     div#welcome {
         height: 100vh;
         background: black;
@@ -10,14 +11,13 @@
 </style>
 
 
-
 <div>
     <div id="welcome">
         <md-toolbar class="md-whiteframe-glow-z2">
             <div class="md-toolbar-tools">
                 <ng-md-icon icon="reorder" style="fill: white" aria-label="Search"></ng-md-icon>
-                <h1>Goblob V 15.07.11</h1>
-                
+                <h1>Goblob V 15.07.17</h1>
+
                 <span flex></span>
 
                 <ng-md-icon icon="search" style="fill: white" aria-label="Search"></ng-md-icon>
@@ -37,7 +37,9 @@
             </section>
 
             <section layout="row" layout-sm="column" layout-align="center center">
-                <md-button ng-click="createUser()" style="width: calc(100% - (16px));height:40px;" class="md-raised md-primary">Register</md-button>
+                <md-button ng-click="createUser()" style="width: calc(100% - (16px));height:40px;"
+                           class="md-raised md-primary">Register
+                </md-button>
             </section>
         </md-content>
     </div>

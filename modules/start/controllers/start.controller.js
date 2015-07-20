@@ -19,7 +19,7 @@ angular
 
 			  $rootScope.db.transaction(function(tx) {
 			     tx.executeSql('CREATE TABLE IF NOT EXISTS profile_table (id integer primary key, profile_name text, profile_status text)');
-			     tx.executeSql('CREATE TABLE IF NOT EXISTS chat_table (id integer primary key, contact_name text, chat_text text, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)');
+			     tx.executeSql('CREATE TABLE IF NOT EXISTS chat_table (id integer primary key, uuid text, person_name text, text text, status text, created_at DATETIME DEFAULT CURRENT_TIMESTAMP, sent_at DATETIME, received_at DATETIME, read_at DATETIME)');
 
 			    // demonstrate PRAGMA:
 			    $rootScope.db.executeSql("pragma table_info (profile_table);", [], function(res) {
