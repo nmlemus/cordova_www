@@ -26,19 +26,29 @@ angular
             };
 
             $scope.getLocation = function () {
+                //var db_geo = window.sqlitePlugin.openDatabase({name: "cordova_bg_locations"});
 
-                $cordovaGeolocation
-                    .getCurrentPosition({timeout: 10000, enableHighAccuracy: false})
-                    .then(function (position) {
-                        console.log("position found");
-                        $scope.position = position;
-                        // long = position.coords.longitude
-                        // lat = position.coords.latitude
-                    }, function (err) {
-                        console.log("unable to find location");
-                        $scope.errorMsg = "Error : " + err.message;
-                    });
+                $rootScope.db.transaction(queryDB, errorCB);
+
+
             };
+
+            function queryDB(tx) {
+                tx.executeSql('SELECT * FROM geo_table', [], querySuccess, errorCB);
+            }
+
+            function querySuccess(tx, results) {
+                var len = results.rows.length;
+                console.log("Geo table: " + len + " rows found.");
+                for (var i=0; i<len; i++){
+                    console.log("Row = " + i + " ID = " + results.rows.item(i).id + " Latitude =  " + results.rows.item(i).latitude + " Longitude =  " + results.rows.item(i).longitude + " Taken From =  " + results.rows.item(i).taken_from);
+                }
+            }
+
+            function errorCB(err) {
+                alert("Error processing SQL: "+err.code);
+            }
+
 
 
             $scope.takePicture = function () {

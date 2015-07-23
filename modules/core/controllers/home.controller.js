@@ -8,13 +8,79 @@
  */
 angular
     .module('core')
-    .controller('HomeController', ['$rootScope', '$state', 'Users', '$http', '$timeout', '$mdSidenav', '$mdUtil', '$log', '$mdDialog', '$cordovaGeolocation', '$cordovaCamera', '$stateParams', '$interval',
-        function ($rootScope, $state, Users, $http, $timeout, $mdSidenav, $mdUtil, $log, $mdDialog, $cordovaGeolocation, $cordovaCamera, $stateParams, $interval) {
+    .controller('HomeController', ['$scope', '$rootScope', '$state', 'Users', '$http', '$timeout', '$mdSidenav', '$mdUtil', '$log', '$mdDialog', '$cordovaGeolocation', '$cordovaBackgroundGeolocation', '$cordovaCamera', '$stateParams', '$interval',
+        function ($scope, $rootScope, $state, Users, $http, $timeout, $mdSidenav, $mdUtil, $log, $mdDialog, $cordovaGeolocation, $cordovaBackgroundGeolocation, $cordovaCamera, $stateParams, $interval) {
 
             $rootScope.phonenumber = $stateParams.phonenumber;
 
+            var watchID = null;
 
+            /* Opciones para la geolocalizacion en el background
+                        var options = {
+                            desiredAccuracy: 10,
+                            stationaryRadius: 20,
+                            distanceFilter: 30,
+                            notificationTitle: 'Background tracking', // <-- android only, customize the title of the notification
+                            notificationText: 'ENABLED', // <-- android only, customize the text of the notification
+                            activityType: 'AutomotiveNavigation',
+                            debug: true, // <-- enable this hear sounds for background-geolocation life-cycle.
+                            stopOnTerminate: false // <-- enable this to clear background location settings when the app terminates
+                        };
+            */
             document.addEventListener('deviceready', function () {
+
+                //Foreground Geolocation
+                var options = {frequency: 3000, timeout: 30000};
+                watchID = navigator.geolocation.watchPosition(onSuccessGeo, onErrorGeo, options);
+
+                //Background Geolocation
+
+                var bgGeo = window.plugins.backgroundGeoLocation;
+
+                var callbackBack = function(location){
+                    $rootScope.db.transaction(function (tx) {
+
+                        tx.executeSql("INSERT INTO geo_table (latitude, longitude, taken_from) VALUES (?,?,?);", [location.latitude, location.longitude, "bgGeo"], function (tx, res) {
+
+                        }, function (e) {
+                            console.log("ERROR: " + e.message);
+                        });
+                    });
+                };
+
+                var failureBack = function(error){
+                    alert('Geolocation Error');
+                };
+
+                bgGeo.configure(callbackBack, failureBack, {
+                    desiredAccuracy: 10,
+                    stationaryRadius: 10,
+                    distanceFilter: 30,
+                    debug: true,
+                    url: 'http://10.0.0.105:3000/geos',
+                    batchSync: true,       // <-- [Default: false] Set true to sync locations to server in a single HTTP request.
+                    autoSync: true         // <-- [Default: true] Set true to sync each location to server as it arrives.
+                });
+
+                // Turn ON the background-geolocation system.  The user will be tracked whenever they suspend the app.
+                bgGeo.start();
+
+                // `configure` calls `start` internally
+                /* $cordovaBackgroundGeolocation.configure(options)
+                    .then(
+                    null, // Background never resolves
+                    function (location) { // notify callback
+                        console.log(location.coords.longitude);
+                    },
+                    function (err) { // error callback
+                        console.error(err);
+                    });
+
+
+                $scope.stopBackgroundGeolocation = function () {
+                    $cordovaBackgroundGeolocation.stop();
+                };*/
+
                 // Android customization
                 cordova.plugins.backgroundMode.setDefaults({
                         title: 'Goblob',
@@ -80,7 +146,7 @@ angular
                             // Insertar en la base de datos local (SQlite) los mensajes recibidos
                             $rootScope.db.transaction(function (tx) {
 
-                                tx.executeSql("INSERT INTO chat_table (uuid, person_name, text, status, timestamp, sent_at, received_at, read_at) VALUES (?,?,?,?,?,?,?,?);", [easyrtcid, "Me", content, "received", null, null, new Date().toISOString(), null], function (tx, res) {
+                                tx.executeSql("INSERT INTO chat_table (uuid, person_name, text, status, created_at, sent_at, received_at, read_at) VALUES (?,?,?,?,?,?,?,?);", [easyrtcid, "Me", content, "received", null, null, new Date().toISOString(), null], function (tx, res) {
                                     console.log("insertId: " + res.insertId + " -- probably 1");
                                     console.log("rowsAffected: " + res.rowsAffected + " -- should be 1");
                                 }, function (e) {
@@ -386,6 +452,31 @@ angular
             $rootScope.stopTimer = function () {
                 $interval.cancel(timer);
             }
+
+            // onSuccess Geolocation
+            //
+            function onSuccessGeo(position) {
+                console.log('Latitude: '  + position.coords.latitude);
+                console.log('Longitude: '  + position.coords.longitude);
+
+                $rootScope.db.transaction(function (tx) {
+
+                    tx.executeSql("INSERT INTO geo_table (latitude, longitude, taken_from) VALUES (?,?,?);", [position.coords.latitude, position.coords.longitude, "fgGeo"], function (tx, res) {
+
+                    }, function (e) {
+                        console.log("ERROR: " + e.message);
+                    });
+                });
+            }
+
+            // onError Callback receives a PositionError object
+            //
+            function onErrorGeo(error) {
+                alert('code: '    + error.code    + '\n' +
+                    'message: ' + error.message + '\n');
+            }
+
+
 
 
         }

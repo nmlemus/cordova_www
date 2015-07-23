@@ -149,6 +149,8 @@ angular
             template.publish = function () {
                 if (!template.input) return;
 
+                var id_Inserted;
+
                 template.messageList[template.messageList.length] = {
                     uuid: "Me",
                     avatar: avatar,
@@ -162,6 +164,7 @@ angular
                 $rootScope.db.transaction(function (tx) {
 
                     tx.executeSql("INSERT INTO chat_table (uuid, person_name, text, status, created_at, sent_at, received_at, read_at) VALUES (?,?,?,?,?,?,?,?);", ["Me", $rootScope.person.name, template.input, "created", new Date().toISOString(), null, null, null], function (tx, res) {
+                        id_Inserted = res.insertId;
                         console.log("insertId: " + res.insertId + " -- probably 1");
                         console.log("rowsAffected: " + res.rowsAffected + " -- should be 1");
                     }, function (e) {
@@ -181,7 +184,7 @@ angular
                     easyrtc.sendDataWS($rootScope.person.name, "message", template.input);
                     // Status update
                     $rootScope.db.transaction(function (tx) {
-                        tx.executeSql("UPDATE chat_table SET status = 'sent';", [], function (tx, res) {
+                        tx.executeSql("UPDATE chat_table SET status = 'sent' WHERE id = ?;", [id_Inserted], function (tx, res) {
                             console.log("Last updated ID = " + res.insertId);
                             console.log("insertId: " + res.insertId + " -- probably 1");
                             console.log("rowsAffected: " + res.rowsAffected + " -- should be 1");
