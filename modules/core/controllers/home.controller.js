@@ -15,6 +15,7 @@ angular
 
             var watchID = null;
 
+
             /* Opciones para la geolocalizacion en el background
                         var options = {
                             desiredAccuracy: 10,
@@ -57,7 +58,7 @@ angular
                     stationaryRadius: 10,
                     distanceFilter: 30,
                     debug: true,
-                    url: 'http://10.0.0.105:3000/geos',
+                    url: 'http://goblob.com:3000/geos',
                     batchSync: true,       // <-- [Default: false] Set true to sync locations to server in a single HTTP request.
                     autoSync: true         // <-- [Default: true] Set true to sync each location to server as it arrives.
                 });

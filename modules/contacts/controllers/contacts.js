@@ -33,6 +33,10 @@ angular
 
             };
 
+            $scope.showMap = function(){
+                $state.go("map");
+            };
+
             function queryDB(tx) {
                 tx.executeSql('SELECT * FROM geo_table', [], querySuccess, errorCB);
             }
@@ -70,7 +74,7 @@ angular
             $scope.data = {
                 selectedIndex: 0,
                 secondLocked:  false,
-                secondLabel:   "Favorites",
+                secondLabel:   "Contact Map",
                 bottom:        false
             };
 

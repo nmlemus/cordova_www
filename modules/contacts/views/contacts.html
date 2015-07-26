@@ -102,12 +102,12 @@
             <div class="md-toolbar-tools">
                 <ng-md-icon icon="reorder" style="fill: white" ng-click="getLocation()"
                             aria-label="Search"></ng-md-icon>
-                <h1>Goblob V 15.07.17</h1>
+                <h1>Goblob V 15.07.24</h1>
 
                 <span flex></span>
 
                 <ng-md-icon icon="search" style="fill: white" ng-click="getLocation()" aria-label="Search"></ng-md-icon>
-                <ng-md-icon icon="settings" style="fill: white" ng-click="getLocation()"
+                <ng-md-icon icon="settings" style="fill: white" ng-click="showMap()"
                             aria-label="Search"></ng-md-icon>
             </div>
         </md-toolbar>
@@ -165,36 +165,7 @@
                 <md-tab id="tab2" ng-disabled="data.secondLocked">
                     <md-tab-label>{{data.secondLabel}}</md-tab-label>
                     <md-tab-body>
-                        <div class="card">
-                            <div class="item item-divider">
-                                Get My Current Location
-                            </div>
-                            <div class="item">
-                                <strong>Longitude </strong> &nbsp {{position.coords.longitude}}
-                            </div>
-                            <div class="item">
-
-                                <strong>Latitude </strong> &nbsp {{position.coords.latitude}}
-                            </div>
-                            <div class="item" ng-show="errorMsg">
-                                <p>{{errorMsg}}</p>
-                            </div>
-                        </div>
-
-                        <div class="padding">
-                            <ng-md-icon icon="location_on" style="fill: lightgreen" ng-click="getLocation()"
-                                        aria-label="Get My Location"></ng-md-icon>
-                        </div>
-
-                        <md-input-container md-no-float>
-                            <md-icon md-svg-src="img/icons/phone325.svg"></md-icon>
-                            <input ng-model="phone" type="text">
-                        </md-input-container>
-                        <md-button ng-click="postPhoneNumber()" class="md-raised md-primary">Primary</md-button>
-
-                        <md-button ng-click="prueba()" class="md-raised md-primary">Prueba</md-button>
-
-                        <a ui-sref="register">State 1</a>
+                        <div id="map"></div>
                     </md-tab-body>
                 </md-tab>
             </md-tabs>
